@@ -160,8 +160,6 @@ def _dict_copy(d):
     return out
 
 def _create_cache_entries_env_vars(toolchain_dict, user_cache, user_env):
-    toolchain_dict.pop("CMAKE_SYSTEM_NAME")  # specify this only in a toolchain file
-
     _move_dict_values(toolchain_dict, user_env, _CMAKE_ENV_VARS_FOR_CROSSTOOL)
     _move_dict_values(toolchain_dict, user_cache, _CMAKE_CACHE_ENTRIES_CROSSTOOL)
 
@@ -227,9 +225,7 @@ def _fill_crossfile_from_toolchain(workspace_name, target_os, tools, flags):
         os_name = "Apple"
     if target_os == "linux":
         os_name = "Linux"
-    dict = {
-        "CMAKE_SYSTEM_NAME": os_name,
-    }
+    dict = {}
 
     _sysroot = _find_in_cc_or_cxx(flags, "sysroot")
     if _sysroot:
