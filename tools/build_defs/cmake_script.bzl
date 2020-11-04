@@ -6,6 +6,8 @@ def create_cmake_script(
         workspace_name,
         target_os,
         cmake_path,
+        make_path,
+        ninja_path,
         tools,
         flags,
         install_prefix,
@@ -23,9 +25,11 @@ def create_cmake_script(
         target_os: OSInfo with target operating system information, used for CMAKE_SYSTEM_NAME in
             CMake toolchain file
         cmake_path: The path to the cmake executable
+        make_path: The path to the make executable
+        ninja_path: The path to the ninja executable
         tools: cc_toolchain tools (CxxToolsInfo)
         flags: cc_toolchain flags (CxxFlagsInfo)
-        install_prefix: value ot pass to CMAKE_INSTALL_PREFIX
+        install_prefix: value to pass to CMAKE_INSTALL_PREFIX
         root: sources root relative to the $EXT_BUILD_ROOT
         no_toolchain_file: if False, CMake toolchain file will be generated, otherwise not
         user_cache: dictionary with user's values of cache initializers
@@ -73,6 +77,10 @@ def create_cmake_script(
     if not params.cache.get("CMAKE_RANLIB"):
         params.cache.update({"CMAKE_RANLIB": ""})
 
+    if len(make_path.split('/')) != 1:
+        params.commands.append("export PATH=$PATH:$(dirname {})".format(make_path))
+    if len(ninja_path.split('/')) != 1:
+        params.commands.append("export PATH=$PATH:$(dirname {})".format(ninja_path))
     set_env_vars = " ".join([key + "=\"" + params.env[key] + "\"" for key in params.env])
     str_cmake_cache_entries = " ".join(["-D" + key + "=\"" + params.cache[key] + "\"" for key in params.cache])
     cmake_call = " ".join([
