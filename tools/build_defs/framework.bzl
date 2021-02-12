@@ -4,7 +4,7 @@
 
 load("@bazel_skylib//lib:collections.bzl", "collections")
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
-load("@rules_foreign_cc//tools/build_defs:detect_root.bzl", "detect_root", "filter_containing_dirs_from_inputs")
+load("@rules_foreign_cc//tools/build_defs:detect_root.bzl", "filter_containing_dirs_from_inputs")
 load(
     "@rules_foreign_cc//tools/build_defs:run_shell_file_utils.bzl",
     "copy_directory",
@@ -47,6 +47,7 @@ CC_EXTERNAL_RULE_ATTRIBUTES = {
         ),
         mandatory = False,
         allow_files = True,
+        cfg = "host",
         default = [],
     ),
     "alwayslink": attr.bool(
@@ -199,7 +200,10 @@ def create_attrs(attr_struct, configure_name, create_configure_script, **kwargs)
     attrs["create_configure_script"] = create_configure_script
 
     for arg in kwargs:
-        attrs[arg] = kwargs[arg]
+        if hasattr(attrs, arg):
+            attrs[arg] += kwargs[arg]
+        else:
+            attrs[arg] = kwargs[arg]
     return struct(**attrs)
 
 # buildifier: disable=name-conventions
@@ -293,7 +297,7 @@ def cc_external_rule_impl(ctx, attrs):
     """
     lib_name = attrs.lib_name or ctx.attr.name
 
-    inputs = _define_inputs(attrs)
+    inputs = _define_inputs(ctx, attrs)
     outputs = _define_outputs(ctx, attrs, lib_name)
     out_cc_info = _define_out_cc_info(ctx, attrs, inputs, outputs)
 
@@ -352,7 +356,7 @@ def cc_external_rule_impl(ctx, attrs):
         "##mkdirs## $$BUILD_TMPDIR$$",
         "##mkdirs## $$EXT_BUILD_DEPS$$",
         _print_env(),
-        "\n".join(_copy_deps_and_tools(inputs)),
+        "\n".join(_copy_deps(inputs)),
         "cd $$BUILD_TMPDIR$$",
         attrs.create_configure_script(ConfigureParameters(ctx = ctx, attrs = attrs, inputs = inputs)),
         "\n".join(make_commands),
@@ -377,14 +381,17 @@ def cc_external_rule_impl(ctx, attrs):
     if "requires-network" in ctx.attr.tags:
         execution_requirements = {"requires-network": ""}
 
+    inputs_from_tools, manifests_from_tools = ctx.resolve_tools(tools = attrs.tools_deps)
+
     ctx.actions.run_shell(
         mnemonic = "Cc" + attrs.configure_name.capitalize() + "MakeRule",
-        inputs = depset(inputs.declared_inputs, transitive = [cc_toolchain.all_files]),
+        inputs = depset(inputs.declared_inputs),
         outputs = rule_outputs + [
             empty.file,
             wrapped_outputs.log_file,
         ],
-        tools = depset([wrapped_outputs.script_file] + ctx.files.data + ctx.files.tools_deps + ctx.files.additional_tools, transitive = [data[DefaultInfo].default_runfiles.files for data in data_dependencies]),
+        input_manifests = manifests_from_tools + inputs.tools_manifests,
+        tools = depset([wrapped_outputs.script_file] + ctx.files.data, transitive = [data[DefaultInfo].default_runfiles.files for data in data_dependencies] + [inputs.tools_files, inputs_from_tools, cc_toolchain.all_files]),
         # We should take the default PATH passed by Bazel, not that from cc_toolchain
         # for Windows, because the PATH under msys2 is different and that is which we need
         # for shell commands
@@ -536,25 +543,10 @@ def _correct_path_variable(env):
     env["PATH"] = "$PATH:" + value
     return env
 
-def _depset(item):
-    if item == None:
-        return depset()
-    return depset([item])
-
-def _list(item):
-    if item:
-        return [item]
-    return []
-
-def _copy_deps_and_tools(files):
+def _copy_deps(files):
     lines = []
     lines += _symlink_contents_to_dir("lib", files.libs)
     lines += _symlink_contents_to_dir("include", files.headers + files.include_dirs)
-
-    if files.tools_files:
-        lines.append("##mkdirs## $$EXT_BUILD_DEPS$$/bin")
-    for tool in files.tools_files:
-        lines.append("##symlink_to_dir## $$EXT_BUILD_ROOT$$/{} $$EXT_BUILD_DEPS$$/bin/".format(tool))
 
     for ext_dir in files.ext_build_dirs:
         lines.append("##symlink_to_dir## $$EXT_BUILD_ROOT$$/{} $$EXT_BUILD_DEPS$$".format(_file_path(ext_dir)))
@@ -656,8 +648,10 @@ InputFiles = provider(
         ),
         libs = "Library files built by Bazel. Will be copied into $EXT_BUILD_DEPS/lib.",
         tools_files = (
-            "Files and directories with tools needed for configuration/building " +
-            "to be copied into the bin folder, which is added to the PATH"
+            "Files and directories with tools needed for configuration/building"
+        ),
+        tools_manifests = (
+            "Manifests to be passed to `manifests_from_tools` attribute"
         ),
         ext_build_dirs = (
             "Directories with libraries, built by framework function. " +
@@ -669,7 +663,7 @@ InputFiles = provider(
     ),
 )
 
-def _define_inputs(attrs):
+def _define_inputs(ctx, attrs):
     cc_infos = []
 
     bazel_headers = []
@@ -698,37 +692,26 @@ def _define_inputs(attrs):
     # but filter out repeating directories
     ext_build_dirs = uniq_list_keep_order(ext_build_dirs)
 
-    tools_roots = []
-    tools_files = []
     input_files = []
-    for tool in attrs.tools_deps:
-        tool_root = detect_root(tool)
-        tools_roots.append(tool_root)
-        for file_list in tool.files.to_list():
-            tools_files += _list(file_list)
-
-    for tool in attrs.additional_tools:
-        for file_list in tool.files.to_list():
-            tools_files += _list(file_list)
-
     for input in attrs.additional_inputs:
         for file_list in input.files.to_list():
-            input_files += _list(file_list)
+            input_files += list(file_list)
 
-    # These variables are needed for correct C/C++ providers constraction,
+    tools_files, manifests_from_tools = ctx.resolve_tools(tools = ctx.attr.tools_deps + attrs.additional_tools)
+    # These variables are needed for correct C/C++ providers construction,
     # they should contain all libraries and include directories.
     cc_info_merged = cc_common.merge_cc_infos(cc_infos = cc_infos)
     return InputFiles(
         headers = bazel_headers,
         include_dirs = bazel_system_includes,
         libs = bazel_libs,
-        tools_files = tools_roots,
+        tools_files = tools_files,
+        tools_manifests = manifests_from_tools,
         deps_compilation_info = cc_info_merged.compilation_context,
         deps_linking_info = cc_info_merged.linking_context,
         ext_build_dirs = ext_build_dirs,
         declared_inputs = filter_containing_dirs_from_inputs(attrs.lib_source.files.to_list()) +
                           bazel_libs +
-                          tools_files +
                           input_files +
                           cc_info_merged.compilation_context.headers.to_list() +
                           ext_build_dirs,

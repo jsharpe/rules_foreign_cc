@@ -79,6 +79,8 @@ def _create_configure_script(configureParameters):
         # as default, pass execution OS as target OS
         target_os = os_name(ctx),
         cmake_path = configureParameters.attrs.cmake_path,
+        make_path = configureParameters.attrs.make_path,
+        ninja_path = configureParameters.attrs.ninja_path,
         tools = tools,
         flags = flags,
         install_prefix = "$$INSTALL_PREFIX$$",
