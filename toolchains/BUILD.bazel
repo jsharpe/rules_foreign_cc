@@ -18,6 +18,11 @@ toolchain_type(
     name = "make_toolchain",
 )
 
+toolchain_type(
+    name = "pkg_config_toolchain",
+)
+
+
 toolchain(
     name = "built_cmake_toolchain",
     toolchain = ":built_cmake",

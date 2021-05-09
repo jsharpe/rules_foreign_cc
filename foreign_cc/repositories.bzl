@@ -62,6 +62,15 @@ def rules_foreign_cc_dependencies(
 
     maybe(
         http_archive,
+        name = "org_freedesktop_pkg_config",
+        build_file = "@rules_foreign_cc//toolchains:pkg-config.BUILD",
+        sha256 = "6fc69c01688c9458a57eb9a1664c9aba372ccda420a02bf4429fe610e7e7d591",
+        strip_prefix = "pkg-config-0.29.2",
+        urls = ["https://pkgconfig.freedesktop.org/releases/pkg-config-0.29.2.tar.gz"],
+    )
+
+    maybe(
+        http_archive,
         name = "bazel_skylib",
         sha256 = "1c531376ac7e5a180e0237938a2536de0c54d93f5c278634818e0efc952dd56c",
         urls = [
