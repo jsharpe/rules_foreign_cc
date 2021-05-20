@@ -9,9 +9,9 @@ def m4_repositories():
         http_archive,
         name = "m4",
         build_file = Label("//m4:BUILD.m4.bazel"),
-        strip_prefix = "m4-1.4.18",
+        strip_prefix = "m4-1.4.18b",
         urls = [
-            "http://ftp.gnu.org/gnu/m4/m4-1.4.18.tar.gz",
+            "https://alpha.gnu.org/gnu/m4/m4-1.4.18b.tar.xz",
         ],
-        sha256 = "ab2633921a5cd38e48797bf5521ad259bdc4b979078034a3b790d7fec5493fab",
+        sha256 = "0aaf6b798e08a1b76966ec0adf678253f86e40b09baa534e1e63655882632db0",
     )
