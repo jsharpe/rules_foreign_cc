@@ -9,6 +9,7 @@ filegroup(
 
 configure_make(
     name = "m4",
+    configure_in_place = 1,
     env = select({
         "@platforms//os:macos": {"AR": ""},
         "//conditions:default": {},
