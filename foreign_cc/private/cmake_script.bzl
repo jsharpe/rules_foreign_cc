@@ -67,8 +67,8 @@ def create_cmake_script(
 
     params.cache.update({
         "CMAKE_BUILD_TYPE": build_type,
-        "CMAKE_INSTALL_PREFIX": install_prefix,
         "CMAKE_INSTALL_LIBDIR": gnuinstall_libdir,
+        "CMAKE_INSTALL_PREFIX": install_prefix,
         "CMAKE_PREFIX_PATH": merged_prefix_path,
     })
 
