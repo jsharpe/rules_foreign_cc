@@ -73,7 +73,7 @@ def _make_toolchain(version, register_toolchains):
         maybe(
             http_archive,
             name = "gnumake_src",
-            build_file_content = _ALL_CONTENT,
+            build_file = Label("//toolchains:BUILD.gnumake"),
             sha256 = "581f4d4e872da74b3941c874215898a7d35802f03732bdccee1d4a7979105d18",
             strip_prefix = "make-4.4",
             urls = [
