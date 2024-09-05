@@ -94,7 +94,6 @@ _MAKE_TOOLS = {
     "AR": "cxx_linker_static",
     "CC": "cc",
     "CXX": "cxx",
-    "LD": "ld",
     # missing: cxx_linker_executable
 }
 
