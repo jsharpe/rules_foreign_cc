@@ -510,6 +510,83 @@ CMAKE_SRCS = {
         "cmake-3.28.1",
         "15e94f83e647f7d620a140a7a5da76349fc47a1bfed66d0f5cdee8e7344079ad",
     ],
+    "3.28.2": [
+        [
+            "https://github.com/Kitware/CMake/releases/download/v3.28.2/cmake-3.28.2.tar.gz",
+        ],
+        "cmake-3.28.2",
+        "1466f872dc1c226f373cf8fba4230ed216a8f108bd54b477b5ccdfd9ea2d124a",
+    ],
+    "3.28.3": [
+        [
+            "https://github.com/Kitware/CMake/releases/download/v3.28.3/cmake-3.28.3.tar.gz",
+        ],
+        "cmake-3.28.3",
+        "72b7570e5c8593de6ac4ab433b73eab18c5fb328880460c86ce32608141ad5c1",
+    ],
+    "3.28.4": [
+        [
+            "https://github.com/Kitware/CMake/releases/download/v3.28.4/cmake-3.28.4.tar.gz",
+        ],
+        "cmake-3.28.4",
+        "eb9c787e078848dc493f4f83f8a4bbec857cd1f38ab6425ce8d2776a9f6aa6fb",
+    ],
+    "3.28.5": [
+        [
+            "https://github.com/Kitware/CMake/releases/download/v3.28.5/cmake-3.28.5.tar.gz",
+        ],
+        "cmake-3.28.5",
+        "a75d3487ffe817e116a2bf668bf1434af7fe5864cbd4c7e3dcf33dd1a470d659",
+    ],
+    "3.28.6": [
+        [
+            "https://github.com/Kitware/CMake/releases/download/v3.28.6/cmake-3.28.6.tar.gz",
+        ],
+        "cmake-3.28.6",
+        "c39c733900affc4eb0e9688b4d1a45435a732105d9bf9cc1e75dd2b9b81a36bb",
+    ],
+    "3.29.0": [
+        [
+            "https://github.com/Kitware/CMake/releases/download/v3.29.0/cmake-3.29.0.tar.gz",
+        ],
+        "cmake-3.29.0",
+        "a0669630aae7baa4a8228048bf30b622f9e9fd8ee8cedb941754e9e38686c778",
+    ],
+    "3.29.1": [
+        [
+            "https://github.com/Kitware/CMake/releases/download/v3.29.1/cmake-3.29.1.tar.gz",
+        ],
+        "cmake-3.29.1",
+        "7fb02e8f57b62b39aa6b4cf71e820148ba1a23724888494735021e32ab0eefcc",
+    ],
+    "3.29.2": [
+        [
+            "https://github.com/Kitware/CMake/releases/download/v3.29.2/cmake-3.29.2.tar.gz",
+        ],
+        "cmake-3.29.2",
+        "36db4b6926aab741ba6e4b2ea2d99c9193222132308b4dc824d4123cb730352e",
+    ],
+    "3.29.3": [
+        [
+            "https://github.com/Kitware/CMake/releases/download/v3.29.3/cmake-3.29.3.tar.gz",
+        ],
+        "cmake-3.29.3",
+        "252aee1448d49caa04954fd5e27d189dd51570557313e7b281636716a238bccb",
+    ],
+    "3.29.4": [
+        [
+            "https://github.com/Kitware/CMake/releases/download/v3.29.4/cmake-3.29.4.tar.gz",
+        ],
+        "cmake-3.29.4",
+        "b1b48d7100bdff0b46e8c8f6a3c86476dbe872c8df39c42b8d104298b3d56a2c",
+    ],
+    "3.29.5": [
+        [
+            "https://github.com/Kitware/CMake/releases/download/v3.29.5/cmake-3.29.5.tar.gz",
+        ],
+        "cmake-3.29.5",
+        "dd63da7d763c0db455ca232f2c443f5234fe0b11f8bd6958a81d29cc987dfd6e",
+    ],
     "3.3.2": [
         [
             "https://github.com/Kitware/CMake/releases/download/v3.3.2/cmake-3.3.2.tar.gz",

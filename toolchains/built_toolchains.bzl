@@ -85,6 +85,21 @@ def _make_toolchain(version, register_toolchains):
         native.register_toolchains(
             "@rules_foreign_cc//toolchains:built_make_toolchain",
         )
+
+    if version == "4.4.1":
+        maybe(
+            http_archive,
+            name = "gnumake_src",
+            build_file_content = _ALL_CONTENT,
+            sha256 = "dd16fb1d67bfab79a72f5e8390735c49e3e8e70b4945a15ab1f81ddb78658fb3",
+            strip_prefix = "make-4.4.1",
+            urls = [
+                "https://mirror.bazel.build/ftpmirror.gnu.org/gnu/make/make-4.4.1.tar.gz",
+                "http://ftpmirror.gnu.org/gnu/make/make-4.4.1.tar.gz",
+            ],
+        )
+        return
+
     if version == "4.4":
         maybe(
             http_archive,
@@ -120,6 +135,32 @@ def _ninja_toolchain(version, register_toolchains):
         native.register_toolchains(
             "@rules_foreign_cc//toolchains:built_ninja_toolchain",
         )
+    if version == "1.12.1":
+        maybe(
+            http_archive,
+            name = "ninja_build_src",
+            build_file_content = _ALL_CONTENT,
+            integrity = "sha256-ghvf9Io/aDvEuztvC1/nstZHz2XVKutjMoyRpsbfKFo=",
+            strip_prefix = "ninja-1.12.1",
+            urls = [
+                "https://mirror.bazel.build/github.com/ninja-build/ninja/archive/v1.12.1.tar.gz",
+                "https://github.com/ninja-build/ninja/archive/v1.12.1.tar.gz",
+            ],
+        )
+        return
+    if version == "1.12.0":
+        maybe(
+            http_archive,
+            name = "ninja_build_src",
+            build_file_content = _ALL_CONTENT,
+            integrity = "sha256-iyyGzUg9x/y3l1xexzKRNdIQCZqJvH2wWQoHsLv+SaU=",
+            strip_prefix = "ninja-1.12.0",
+            urls = [
+                "https://mirror.bazel.build/github.com/ninja-build/ninja/archive/v1.12.0.tar.gz",
+                "https://github.com/ninja-build/ninja/archive/v1.12.0.tar.gz",
+            ],
+        )
+        return
     if version == "1.11.1":
         maybe(
             http_archive,
@@ -167,6 +208,19 @@ def _meson_toolchain(version, register_toolchains):
         native.register_toolchains(
             "@rules_foreign_cc//toolchains:built_meson_toolchain",
         )
+    if version == "1.5.1":
+        maybe(
+            http_archive,
+            name = "meson_src",
+            build_file_content = _MESON_BUILD_FILE_CONTENT,
+            sha256 = "567e533adf255de73a2de35049b99923caf872a455af9ce03e01077e0d384bed",
+            strip_prefix = "meson-1.5.1",
+            urls = [
+                "https://mirror.bazel.build/github.com/mesonbuild/meson/releases/download/1.5.1/meson-1.5.1.tar.gz",
+                "https://github.com/mesonbuild/meson/releases/download/1.5.1/meson-1.5.1.tar.gz",
+            ],
+        )
+        return
     if version == "1.1.1":
         maybe(
             http_archive,
@@ -206,8 +260,6 @@ def _pkgconfig_toolchain(version, register_toolchains):
         http_archive,
         name = "glib_dev",
         build_file_content = '''
-load("@rules_cc//cc:defs.bzl", "cc_library")
-
 cc_import(
     name = "glib_dev",
     hdrs = glob(["include/**"]),
@@ -292,6 +344,9 @@ cc_import(
 
                 # This patch is required as rules_foreign_cc runs in MSYS2 on Windows and MSYS2's "mkdir" is used
                 Label("//toolchains:pkgconfig-makefile-vc.patch"),
+
+                # This patch fixes explicit integer conversion which causes errors in clang >= 15 and gcc >= 14
+                Label("//toolchains:pkgconfig-builtin-glib-int-conversion.patch"),
             ],
             urls = [
                 "https://pkgconfig.freedesktop.org/releases/pkg-config-0.29.2.tar.gz",
